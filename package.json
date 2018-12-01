@@ -1,0 +1,27 @@
+{
+  "name": "dailyissue",
+  "version": "1.0.0",
+  "description": "#### target : https://news.naver.com/main/home.nhn #### url fetch -> npm cheerio",
+  "main": "app.js",
+  "dependencies": {
+    "aws-smtp-credentials": "^1.0.0",
+    "body-parser": "^1.18.3",
+    "cheerio": "^1.0.0-rc.2",
+    "crypto": "^1.0.1",
+    "ejs": "^2.6.1",
+    "express": "^4.16.4",
+    "express-jwt": "^5.3.1",
+    "fetch": "^1.1.0",
+    "fs": "0.0.1-security",
+    "moment": "^2.22.2",
+    "mysql2": "^1.6.4",
+    "nodemailer": "^4.7.0",
+    "uuid": "^3.3.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}

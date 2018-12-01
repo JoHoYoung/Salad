@@ -1,0 +1,77 @@
+@font-face {
+    font-family: DOHYEON;
+    src: url('../fonts/BMDOHYEON_otf.otf') format('opentype')
+}
+
+@font-face {
+    font-family: HANNA11;
+    src: url('../fonts/BMHANNA_11yrs_otf.otf') format('opentype')
+}
+
+
+@font-face {
+    font-family: HANNAair;
+    src: url('../fonts/BMHANNAAir_otf.otf') format('opentype')
+}
+@font-face {
+    font-family: HANNAPro;
+    src: url('../fonts/BMHANNAProOTF.otf') format('opentype')
+}
+@font-face {
+    font-family: JUA;
+    src: url('../fonts/BMJUA_otf.otf') format('opentype')
+}
+@font-face {
+    font-family: KIRAN;
+    src: url('../fonts/BMKIRANGHAERANG-OTF.otf') format('opentype')
+}
+
+@font-face {
+    font-family: YEONSUNG;
+    src: url('../fonts/BMYEONSUNG_otf.otf') format('opentype')
+}
+
+body{
+    background-color: #fafafa;
+}
+.mainbanner
+{
+    margin-left: 25vw;
+    margin-top:10vw;
+    font-family : HANNAPro;
+    font-size:10vw;
+}
+
+.subbanner{
+
+    font-family: HANNAair;
+    font-size:3vw;
+    margin-left:29vw;
+}
+
+.startbox{
+    width: 20vw;
+    display: inline-block;
+    border: 1px solid black;
+    height: 5vw;
+    border-radius: 2vw;
+    margin-left: 37vw;
+    margin-top: 3vw;
+    text-align: center;
+    padding-top: 2.5vw;
+    font-size: 3vw;
+    font-family: HANNAPro;
+    background-color: #ffffff;
+    color: black;
+}
+
+.startbox:hover{
+    font-size:3.5vw;
+    margin-left: 36vw;
+    margin-top:2.5vw;
+    width: 22vw;
+    height: 6vw;
+    background-color: #cfd7ff;
+    cursor:pointer;
+
+}
