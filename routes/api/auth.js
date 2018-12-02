@@ -6,7 +6,85 @@ const crypto = require('crypto')
 const db = require('../../helper/mysql')
 const pool = db.pool
 const promiseHandler = require('../../helper/promiseHandler')
+/**
+ * @swagger
+ * tags:
+ *   name: Auth
+ *   description: 유저 인증 관련 API 입니다
+ * definitions:
+ *   Todo:
+ *     type: object
+ *     required:
+ *       - content
+ *     properties:
+ *       _id:
+ *         type: string
+ *         description: ObjectID
+ *       content:
+ *         type: string
+ *         description: 할일 내용
+ *       done:
+ *         type: boolean
+ *         description: 완료 여부
+ */
 
+/**
+ * @swagger
+ * /token:
+ *   post:
+ *     summary: 유저의 만료된 토큰을 갱신하여 리턴합니다.
+ *     tags: [Auth]
+ *     parameters:
+ *      - name: accessToken
+ *        in: body
+ *        description: 해당 유저의 만료된 accessToken
+ *        type: array
+ *        example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ0ZXN0aWQiLCJleHAiOjE1NDM4MjYwNzIsImlhdCI6MTU0MzczOTY3Mn0.82zH2AdRxUfnFjWC1WZtqpO-Gx3iov-CCRUsTEMcu-Q"
+ *      - name: refreshToken
+ *        in: body
+ *        description: 해당 유저의 refreshToken
+ *        type: array
+ *        example: "eyasdf123qqwdadssnR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ0ZXN0aWQiLCJleHAiOjE1NDM4MjYwNzIsImlhdCI6MTU0MzczOTY3Mn0.82zH2AdRxUfnFjWC1WZtqpO-Gx3iov-CCRUsTEMcu-Q"
+ *     responses:
+ *       200:
+ *         description: 해당 유저의 토큰을 갱신하여 리턴합니다.
+ *         properties:
+ *           statusCode:
+ *             type : integer
+ *             example : 200
+ *           statusMsg:
+ *              type : string
+ *              example : "success"
+ *           data:
+ *              type: object
+ *              properties:
+ *                  accessToken :
+ *                      type : string
+ *                      example : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ0ZXN0aWQiLCJleHAiOjE1NDM4MjYwNzIsImlhdCI6MTU0MzczOTY3Mn0.82zH2AdRxUfnFjWC1WZtqpO-Gx3iov-CCRUsTEMcu-Q"
+ *                  refreshToken :
+ *                      type : string
+ *                      example : "wqerqr3143424312234123412344321321324CJ9.eyJ1213412344132QiLCJleHAiOjE1NDM4MjYwNzIsImlhdCI6MTU0MzczOTY3Mn0.82zH2AdRxUfnFjWC1WZtqpO-Gx3iov-CCRUsTEMcu-Q"
+ *       716:
+ *          description: 토큰이 유효하지 않을경우 에러를 리턴합니다
+ *          properties:
+ *            statusCode:
+ *              type: integer
+ *              example: 716
+ *            statusMsg:
+ *              type: array
+ *              example: "Failed to get a new access token"
+ *       705:
+ *          description: request의 바디에 인자가 없을경우 에러를 리턴합니다.
+ *          properties:
+ *            statusCode:
+ *              type: integer
+ *              example: 705
+ *            statusMsg:
+ *              type: array
+ *              example: "A missing parameter"
+ *
+ *
+ */
 
 
 // MARK: api/auth/token
@@ -42,6 +120,59 @@ router.post("/token", (req, res) => {
     }
 })
 
+/**
+ * @swagger
+ * /signup:
+ *   post:
+ *     summary: 회원가입 을 처리합니다.
+ *     tags: [Auth]
+ *     parameters:
+ *      - name: email
+ *        in: body
+ *        description: 유저가 로그인할때 사용할 이메일값을 받습니다.
+ *        type: array
+ *        example: "whghdud17@gmail.com"
+ *      - name: name
+ *        in: body
+ *        description: 유저의 닉네임값을 받습니다.
+ *        type: array
+ *        example: "닉네임짓는중"
+ *      - name: password
+ *        in: body
+ *        description: 유저가 로그인할 패스워드를 받습니다.
+ *        type: array
+ *        example: "123128awsd!"
+ *     responses:
+ *       200:
+ *         description: 회원가입에 성공
+ *         properties:
+ *           statusCode:
+ *             type : integer
+ *             example : 200
+ *           statusMsg:
+ *              type : string
+ *              example : "success"
+ *       701:
+ *          description: 중복된 이메일이 존재할 경우 에러를 리턴합니다.
+ *          properties:
+ *            statusCode:
+ *              type: integer
+ *              example: 701
+ *            statusMsg:
+ *              type: array
+ *              example: "Email already exist"
+ *       705:
+ *          description: 중복된 닉네임이 존재할 경우 에러를 리턴합니다.
+ *          properties:
+ *            statusCode:
+ *              type: integer
+ *              example: 702
+ *            statusMsg:
+ *              type: array
+ *              example: "Username already Exist"
+ *
+ *
+ */
 
 //MARK : api/auth/signup
 router.post('/signup', helpers.asyncWrapper(async (req,res) => {

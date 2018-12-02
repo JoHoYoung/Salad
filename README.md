@@ -70,3 +70,6 @@ if (userinfo.password == await promiseHandler.getHashedPassword(password, userin
 ```
 4. 로그인에 성공하면 jwt토큰 값을 클라이언트에 전달해주며 해당 토큰으로 세션을 관리한다.
 5. 토큰이 만료시 refreshtoken으로 accesstoken을 갱신하여 다시 클라이언트에 전달한다.
+
+#### Swagger 연동
+- api문서 작성은 swagger를 연동하여 작성한다.

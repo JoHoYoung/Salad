@@ -18,7 +18,10 @@
     "nodemailer": "^4.7.0",
     "uuid": "^3.3.2"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "swagger-jsdoc": "^3.2.6",
+    "swagger-ui-express": "^4.0.1"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

@@ -9,15 +9,49 @@ const expressJWT = require('express-jwt')
 const app = express()                                       // 기본설정.
 const jwt = require('./helper/jwtauth')
 const db=require('./helper/mysql')
-
 const helper = require('./helper/helper')
 const pool = db.pool;
+
+
+//Swagger 연동
+const swaggerJSDoc = require('swagger-jsdoc')
+const swaggerUi = require('swagger-ui-express')
+
+var swaggerDefinition = {
+    info: { // API informations (required)
+        title: 'Hello World', // Title (required)
+        version: '1.0.0', // Version (required)
+        description: 'A sample API', // Description (optional)
+    },
+    host: 'localhost:3000', // Host (optional)
+    basePath: '/api', // Base path (optional)
+    securityDefinitions: {
+        jwt: {
+            type: 'apiKey',
+            name: 'Authorization',
+            in: 'header'
+        }
+    },
+    security: [
+        { jwt: [] }
+    ]
+}
+
+var options = {
+    // Import swaggerDefinitions
+    swaggerDefinition: swaggerDefinition,
+    // Path to the API docs
+    apis: ['./routes/api/*.js']
+}
+
+const swaggerSpec = swaggerJSDoc(options);
 
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json());                                 // request의 body값을 가져오기 위한 설정
 
 app.use('/public', static(path.join(__dirname, 'public'))); // static 폴더 설정
 
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use(expressJWT({
     secret: account.JWT_SECRET,
     credentialsRequired: false,
