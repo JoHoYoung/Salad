@@ -73,3 +73,10 @@ if (userinfo.password == await promiseHandler.getHashedPassword(password, userin
 
 #### Swagger 연동
 - api문서 작성은 swagger를 연동하여 작성한다.
+
+#### Oauth
+1. Oauth의 경우 별도의 회원가입 과정을 거치지 않는다.
+2. 다만, Oauth로 처음 접속하는 유저의 경우 특정코드를 반납, 닉네임을 입력하게 한다.
+3. 게시판의 특성상 Oauth에서 제공하는 uid를 유저닉네임으로 쓰는것은 적합하지 않은것 같다.
+4. 새로운 유저가 닉네임을 입력하면, DB에 회원 레코드를 넣는다.
+5. 해당유저는 다음에 Oauth시 별도의 과정 없이 바로 로그인 하게 된다.

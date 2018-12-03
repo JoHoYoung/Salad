@@ -281,8 +281,8 @@ router.post('/signup', helpers.asyncWrapper(async (req,res) => {
  *           data:
  *              properties:
  *               key:
- *                type:array
- *                example:"10002131200"
+ *                type: array
+ *                example: "10002131200"
  *               provider_type:
  *                type: integer
  *                example: 1
@@ -329,7 +329,7 @@ router.post('/signin', helpers.asyncWrapper(async (req,res) => {
         }
 
         if (userinfo.password == await promiseHandler.getHashedPassword(password, userinfo.salt)) {
-            jwt.generate(useremail, function (err, accesstoken, refreshtoken) {
+            jwt.generate(userinfo.id, function (err, accesstoken, refreshtoken) {
 
                 res.json({
                     statusCode: 200,
@@ -355,7 +355,7 @@ router.post('/signin', helpers.asyncWrapper(async (req,res) => {
         let provider_type = req.body.provider_type
         let key = req.body.key
 
-        let existQ = "SELECT * FROM USER WHERE user_email = ?"
+        let existQ = "SELECT * FROM USER WHERE id = ?"
         let exist = (await conn.query(existQ,[key]))
 
         if(exist == null)
@@ -445,16 +445,13 @@ router.post('/signin', helpers.asyncWrapper(async (req,res) => {
 //MARK: api/auth/firstoauth
 router.post('/firstoauth', helpers.asyncWrapper(async (req,res) => {
 
-    let conn= pool.getConne
+    let conn = await pool.getConnection()
     let key = req.body.key
     let provider_type = req.body.provider_type
     let user_name = req.body.user_name
 
-    let insertQ = "INSERT INTO USER(id, user_email, user_name, state, provider_type, created_date, updated_date) "  +
-                    "VALUES(?, ?, ?, ?, ?, now(), now())"
-    await conn.query(insertQ,[uuid.v4(),key,user_name,'C',provider_type])
-    let exist = (await conn.query("SELECT * FROM USER WHERE user_name = '" + user_name + "'"))[0][0]
 
+    let exist = (await conn.query("SELECT * FROM USER WHERE user_name = '" + user_name + "'"))[0][0]
     if(exist != null)
     {
         res.json({
@@ -464,6 +461,13 @@ router.post('/firstoauth', helpers.asyncWrapper(async (req,res) => {
         conn.release()
         return
     }
+
+    let insertQ = "INSERT INTO USER(id, user_name, state, provider_type, created_date, updated_date) "  +
+                    "VALUES( ?, ?, ?, ?, now(), now())"
+    await conn.query(insertQ,[key,user_name,'C',provider_type])
+
+
+
     jwt.generate(key, (err, accesstoken, refreshtoken) => {
 
         res.json({
@@ -476,7 +480,130 @@ router.post('/firstoauth', helpers.asyncWrapper(async (req,res) => {
         return
     })
 
+}))
+
+/**
+ * @swagger
+ * /checkname:
+ *   post:
+ *     summary: 닉네임 중복체크를 합니다.
+ *     tags: [Auth]
+ *     parameters:
+ *      - name: user_name
+ *        in: body
+ *        description: 닉네임 값을 받습니다.
+ *        type: array
+ *        example: "호영짱"
+ *     responses:
+ *       200:
+ *         description: 중복되지 않는 닉네임일 경우 200을 반납합니다.
+ *         properties:
+ *           statusCode:
+ *             type : integer
+ *             example : 200
+ *           statusMsg:
+ *              type : string
+ *              example : "success"
+ *       702:
+ *         description: 중복된 경우 702를 반납합니다.
+ *         properties:
+ *           statusCode:
+ *             type : integer
+ *             example : 702
+ *           statusMsg:
+ *              type : string
+ *              example : "Username already Exist"
+ */
+
+//MARK : api/auth/checkname
+router.post('/checkname', helpers.asyncWrapper(async (req,res) => {
+
+    let user_name = req.body.user_name
+
+    let existQ = "SELECT * FROM USER WHERE user_name =?"
+    let exist = (await conn.query(existQ,[user_name]))[0][0]
+
+    if(exist != null)
+    {
+        res.json({
+            statusCode : 702,
+            statusMsg : "Username already Exist"
+        })
+        conn.release()
+        return
+    }
+    else{
+        res.json({
+            statusCode : 200,
+            statusMsg : "success"
+        })
+        conn.release()
+        return
+    }
 
 }))
+
+
+/**
+ * @swagger
+ * /checkemail:
+ *   post:
+ *     summary: 이메일 중복체크를 합니다.
+ *     tags: [Auth]
+ *     parameters:
+ *      - name: email
+ *        in: body
+ *        description: 이메일 값을 받습니다.
+ *        type: array
+ *        example: "whghdud17@gmail.com"
+ *     responses:
+ *       200:
+ *         description: 중복되지 않는 이메일일 경우 200을 반납합니다.
+ *         properties:
+ *           statusCode:
+ *             type : integer
+ *             example : 200
+ *           statusMsg:
+ *              type : string
+ *              example : "success"
+ *       701:
+ *         description: 중복된 경우 701을 반납합니다.
+ *         properties:
+ *           statusCode:
+ *             type : integer
+ *             example : 701
+ *           statusMsg:
+ *              type : string
+ *              example : "Email already Exist"
+ */
+//MARK : api/auth/checkemail
+router.post('/checkemail', helpers.asyncWrapper(async (req,res) => {
+
+    let email = req.body.email
+
+    let existQ = "SELECT * FROM USER WHERE user_email =?"
+    let exist = (await conn.query(existQ,[email]))[0][0]
+
+    if(exist != null)
+    {
+        res.json({
+            statusCode : 701,
+            statusMsg : "Email already Exist"
+        })
+        conn.release()
+        return
+    }
+    else{
+        res.json({
+            statusCode : 200,
+            statusMsg : "success"
+        })
+        conn.release()
+        return
+    }
+
+}))
+
+
 
 module.exports=router
