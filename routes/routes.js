@@ -11,8 +11,7 @@ const pool = db.pool
 
 router.get('/',helper.asyncWrapper(async(req,res) => {
 
-    console.log(req.user)
-    res.send(req.toString())
+    res.send("Connected")
 }))
 
 module.exports = router

@@ -216,7 +216,7 @@ router.post('/signup', helpers.asyncWrapper(async (req,res) => {
     let hashed_password = obj[1]
 
     let insertUserQ = "INSERT INTO USER(id, user_email, user_name, password,provider_type, salt, state, created_date, updated_date) " +
-                        "VALUES(?, ?, ?, ?, ?, 'T', now(), now())"
+                        "VALUES(?, ?, ?, ?, ?, ?, 'T', now(), now())"
     await conn.query(insertUserQ,[uuid.v4(),useremail,username,hashed_password,0,salt])
 
     res.json({
@@ -228,6 +228,85 @@ router.post('/signup', helpers.asyncWrapper(async (req,res) => {
 }))
 
 
+/**
+ * @swagger
+ * /signin:
+ *   post:
+ *     summary: 로그인및 Oauth로그인을 처리합니다.
+ *     tags: [Auth]
+ *     parameters:
+ *      - name: email
+ *        in: body
+ *        description: 유저가 로그인할때 사용할 이메일값을 받습니다. Oauth일 경우 key를 넣어보냅니다.
+ *        type: array
+ *        example: "whghdud17@gmail.com"
+ *      - name: password
+ *        in: body
+ *        description: 유저의 비밀번호 값을 받습니다. Oauth일 경우 해당필드는 비워둡니다.
+ *        type: array
+ *        example: "비밀번호 "
+ *      - name: provider_type
+ *        in: body
+ *        description: 유저가 Oauth인지 자체 로그인인지 판별하여 보냅니다.
+ *        type: array
+ *        example: "자체 로그인일 경우 - { provider_type : 0 }, kakao : 1, facebook : 2"
+ *     responses:
+ *       200:
+ *         description: 토큰을 반납합니다.
+ *         properties:
+ *           statusCode:
+ *             type : integer
+ *             example : 200
+ *           statusMsg:
+ *              type : string
+ *              example : "success"
+ *           data:
+ *              type: object
+ *              properties:
+ *                  accessToken :
+ *                      type : string
+ *                      example : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ0ZXN0aWQiLCJleHAiOjE1NDM4MjYwNzIsImlhdCI6MTU0MzczOTY3Mn0.82zH2AdRxUfnFjWC1WZtqpO-Gx3iov-CCRUsTEMcu-Q"
+ *                  refreshToken :
+ *                      type : string
+ *                      example : "wqerqr3143424312234123412344321321324CJ9.eyJ1213412344132QiLCJleHAiOjE1NDM4MjYwNzIsImlhdCI6MTU0MzczOTY3Mn0.82zH2AdRxUfnFjWC1WZtqpO-Gx3iov-CCRUsTEMcu-Q"
+ *       300:
+ *         description: 해당유저가 이메일을 등록하지 않은 oauth 유저일경우 300코드를 리턴합니다..
+ *         properties:
+ *           statusCode:
+ *             type : integer
+ *             example : 300
+ *           statusMsg:
+ *              type : string
+ *              example : "Nickname is required"
+ *           data:
+ *              properties:
+ *               key:
+ *                type:array
+ *                example:"10002131200"
+ *               provider_type:
+ *                type: integer
+ *                example: 1
+ *       703:
+ *          description: 이메일이 존재하지 않을경우 에러를 리턴합니다.
+ *          properties:
+ *            statusCode:
+ *              type: integer
+ *              example: 703
+ *            statusMsg:
+ *              type: array
+ *              example: "Invalid email"
+ *       704:
+ *          description: 비밀번호가 틀렸을 경우 에러와 받은 키를 리턴합니다
+ *          properties:
+ *            statusCode:
+ *              type: integer
+ *              example: 704
+ *            statusMsg:
+ *              type: array
+ *              example: "Invalid password"
+ *
+ *
+ */
 //MARK : api/auth/signin
 router.post('/signin', helpers.asyncWrapper(async (req,res) => {
 
@@ -254,6 +333,7 @@ router.post('/signin', helpers.asyncWrapper(async (req,res) => {
 
                 res.json({
                     statusCode: 200,
+                    statusMsg: "success",
                     accesstoken: accesstoken,
                     refreshtoken: refreshtoken
                 })
@@ -263,7 +343,7 @@ router.post('/signin', helpers.asyncWrapper(async (req,res) => {
         }
         else {
             res.json({
-                statusCode: 709,
+                statusCode: 704,
                 statusMsg: "Invalid password"
             })
             conn.release()
@@ -293,7 +373,6 @@ router.post('/signin', helpers.asyncWrapper(async (req,res) => {
         }
         else
         {
-
             jwt.generate(key,function(err, accesstoken, refreshtoken){
 
                 res.json({
@@ -309,11 +388,64 @@ router.post('/signin', helpers.asyncWrapper(async (req,res) => {
     }
 }))
 
-
+/**
+ * @swagger
+ * /firstoauth:
+ *   post:
+ *     summary: Oauth 로그인을 시도한 후 300코드를 받은 유저의 회원등록을 처리합니다.
+ *     tags: [Auth]
+ *     parameters:
+ *      - name: key
+ *        in: body
+ *        description: 300 코드와 함께 받은 Oauth키를 보냅니다.
+ *        type: array
+ *        example: "100041324321004132"
+ *      - name: provider_type
+ *        in: body
+ *        description: 300 코드와 함께 받은 provider_type 을 보냅니다.
+ *        type: integer
+ *        example: 1
+ *      - name: user_name
+ *        in: body
+ *        description: 유저가 사용하기로 한 닉네임을 보냅니다.
+ *        type: array
+ *        example: "호영짱"
+ *     responses:
+ *       200:
+ *         description: 정상적으로 db에 저장 후 토큰값을 줍니다.
+ *         properties:
+ *           statusCode:
+ *             type : integer
+ *             example : 200
+ *           statusMsg:
+ *              type : string
+ *              example : "success"
+ *           data:
+ *              type: object
+ *              properties:
+ *                  accessToken :
+ *                      type : string
+ *                      example : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ0ZXN0aWQiLCJleHAiOjE1NDM4MjYwNzIsImlhdCI6MTU0MzczOTY3Mn0.82zH2AdRxUfnFjWC1WZtqpO-Gx3iov-CCRUsTEMcu-Q"
+ *                  refreshToken :
+ *                      type : string
+ *                      example : "wqerqr3143424312234123412344321321324CJ9.eyJ1213412344132QiLCJleHAiOjE1NDM4MjYwNzIsImlhdCI6MTU0MzczOTY3Mn0.82zH2AdRxUfnFjWC1WZtqpO-Gx3iov-CCRUsTEMcu-Q"
+ *       702:
+ *          description: 닉네임이 이미 존재할경우 에러를 리턴합니다.
+ *          properties:
+ *            statusCode:
+ *              type: integer
+ *              example: 702
+ *            statusMsg:
+ *              type: array
+ *              example: "Username already Exist"
+ *
+ *
+ *
+ */
 //MARK: api/auth/firstoauth
 router.post('/firstoauth', helpers.asyncWrapper(async (req,res) => {
 
-    let conn = pool.getConnection()
+    let conn= pool.getConne
     let key = req.body.key
     let provider_type = req.body.provider_type
     let user_name = req.body.user_name
@@ -321,6 +453,17 @@ router.post('/firstoauth', helpers.asyncWrapper(async (req,res) => {
     let insertQ = "INSERT INTO USER(id, user_email, user_name, state, provider_type, created_date, updated_date) "  +
                     "VALUES(?, ?, ?, ?, ?, now(), now())"
     await conn.query(insertQ,[uuid.v4(),key,user_name,'C',provider_type])
+    let exist = (await conn.query("SELECT * FROM USER WHERE user_name = '" + user_name + "'"))[0][0]
+
+    if(exist != null)
+    {
+        res.json({
+            statusCode:702,
+            statusMsg:'Username already Exist',
+        })
+        conn.release()
+        return
+    }
     jwt.generate(key, (err, accesstoken, refreshtoken) => {
 
         res.json({
