@@ -2,8 +2,6 @@ server {
         listen 80 default_server;
         listen [::]:80 default_server;
 
-
-
         # Logs
         access_log /var/log/nginx/nginx_fingo.log;
         error_log /var/log/nginx/nginx_fingo_error.log warn;
