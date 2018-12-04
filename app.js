@@ -19,9 +19,9 @@ const swaggerUi = require('swagger-ui-express')
 
 var swaggerDefinition = {
     info: { // API informations (required)
-        title: 'Hello World', // Title (required)
+        title: 'Depromeet_Salad API Docs', // Title (required)
         version: '1.0.0', // Version (required)
-        description: 'A sample API', // Description (optional)
+        description: '기본적으로 모든 api앞에 /api가 붙습니다', // Description (optional)
     },
     host: 'localhost:3000', // Host (optional)
     basePath: '/api', // Base path (optional)

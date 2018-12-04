@@ -64,15 +64,6 @@ const promiseHandler = require('../../helper/promiseHandler')
  *                  refreshToken :
  *                      type : string
  *                      example : "wqerqr3143424312234123412344321321324CJ9.eyJ1213412344132QiLCJleHAiOjE1NDM4MjYwNzIsImlhdCI6MTU0MzczOTY3Mn0.82zH2AdRxUfnFjWC1WZtqpO-Gx3iov-CCRUsTEMcu-Q"
- *       716:
- *          description: 토큰이 유효하지 않을경우 에러를 리턴합니다
- *          properties:
- *            statusCode:
- *              type: integer
- *              example: 716
- *            statusMsg:
- *              type: array
- *              example: "Failed to get a new access token"
  *       705:
  *          description: request의 바디에 인자가 없을경우 에러를 리턴합니다.
  *          properties:
@@ -82,8 +73,24 @@ const promiseHandler = require('../../helper/promiseHandler')
  *            statusMsg:
  *              type: array
  *              example: "A missing parameter"
- *
- *
+ *       716:
+ *         description: 토큰이 잘못됐을 경우 에러코드를 리턴합니다.
+ *         properties:
+ *           statusCode:
+ *             type: integer
+ *             example: 716
+ *           statusMsg:
+ *             type: array
+ *             example: "Invalid Token"
+ *       719:
+ *         description: 토큰이 없을 경우 에러코드를 리턴합니다.
+ *         properties:
+ *           statusCode:
+ *             type: integer
+ *             example: 716
+ *           statusMsg:
+ *             type: array
+ *             example: "Invalid Token"
  */
 
 
@@ -170,8 +177,24 @@ router.post("/token", (req, res) => {
  *            statusMsg:
  *              type: array
  *              example: "Username already Exist"
- *
- *
+ *       716:
+ *         description: 토큰이 잘못됐을 경우 에러코드를 리턴합니다.
+ *         properties:
+ *           statusCode:
+ *             type: integer
+ *             example: 716
+ *           statusMsg:
+ *             type: array
+ *             example: "Invalid Token"
+ *       719:
+ *         description: 토큰이 없을 경우 에러코드를 리턴합니다.
+ *         properties:
+ *           statusCode:
+ *             type: integer
+ *             example: 716
+ *           statusMsg:
+ *             type: array
+ *             example: "Invalid Token"
  */
 
 //MARK : api/auth/signup
@@ -304,8 +327,24 @@ router.post('/signup', helpers.asyncWrapper(async (req,res) => {
  *            statusMsg:
  *              type: array
  *              example: "Invalid password"
- *
- *
+ *       716:
+ *         description: 토큰이 잘못됐을 경우 에러코드를 리턴합니다.
+ *         properties:
+ *           statusCode:
+ *             type: integer
+ *             example: 716
+ *           statusMsg:
+ *             type: array
+ *             example: "Invalid Token"
+ *       719:
+ *         description: 토큰이 없을 경우 에러코드를 리턴합니다.
+ *         properties:
+ *           statusCode:
+ *             type: integer
+ *             example: 716
+ *           statusMsg:
+ *             type: array
+ *             example: "Invalid Token"
  */
 //MARK : api/auth/signin
 router.post('/signin', helpers.asyncWrapper(async (req,res) => {
@@ -438,9 +477,24 @@ router.post('/signin', helpers.asyncWrapper(async (req,res) => {
  *            statusMsg:
  *              type: array
  *              example: "Username already Exist"
- *
- *
- *
+ *       716:
+ *         description: 토큰이 잘못됐을 경우 에러코드를 리턴합니다.
+ *         properties:
+ *           statusCode:
+ *             type: integer
+ *             example: 716
+ *           statusMsg:
+ *             type: array
+ *             example: "Invalid Token"
+ *       719:
+ *         description: 토큰이 없을 경우 에러코드를 리턴합니다.
+ *         properties:
+ *           statusCode:
+ *             type: integer
+ *             example: 716
+ *           statusMsg:
+ *             type: array
+ *             example: "Invalid Token"
  */
 //MARK: api/auth/firstoauth
 router.post('/firstoauth', helpers.asyncWrapper(async (req,res) => {
@@ -465,8 +519,6 @@ router.post('/firstoauth', helpers.asyncWrapper(async (req,res) => {
     let insertQ = "INSERT INTO USER(id, user_name, state, provider_type, created_date, updated_date) "  +
                     "VALUES( ?, ?, ?, ?, now(), now())"
     await conn.query(insertQ,[key,user_name,'C',provider_type])
-
-
 
     jwt.generate(key, (err, accesstoken, refreshtoken) => {
 
@@ -603,7 +655,5 @@ router.post('/checkemail', helpers.asyncWrapper(async (req,res) => {
     }
 
 }))
-
-
 
 module.exports=router

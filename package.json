@@ -4,6 +4,7 @@
   "description": "#### target : https://news.naver.com/main/home.nhn #### url fetch -> npm cheerio",
   "main": "app.js",
   "dependencies": {
+    "aws-sdk": "^2.369.0",
     "aws-smtp-credentials": "^1.0.0",
     "body-parser": "^1.18.3",
     "cheerio": "^1.0.0-rc.2",
@@ -14,6 +15,8 @@
     "fetch": "^1.1.0",
     "fs": "0.0.1-security",
     "moment": "^2.22.2",
+    "multer": "^1.4.1",
+    "multer-s3": "^2.9.0",
     "mysql2": "^1.6.4",
     "nodemailer": "^4.7.0",
     "uuid": "^3.3.2"

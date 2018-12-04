@@ -80,3 +80,9 @@ if (userinfo.password == await promiseHandler.getHashedPassword(password, userin
 3. 게시판의 특성상 Oauth에서 제공하는 uid를 유저닉네임으로 쓰는것은 적합하지 않은것 같다.
 4. 새로운 유저가 닉네임을 입력하면, DB에 회원 레코드를 넣는다.
 5. 해당유저는 다음에 Oauth시 별도의 과정 없이 바로 로그인 하게 된다.
+
+#### Multipart
+1. 유저의 프로필 사진은 AWS s3에 multer-s3를 사용하여 업로드 한다.
+2. 업로드 후 리턴받은 url은 PROFILE table의 media_url 속성에 저장한다.
+3. 유저의 프로필의 user_id속성은 USER 테이블의 id를 참조하는 외래키 이다.
+4. PROFILE table에서 유저의 프로필사진, 정보 등을 관리한다.
