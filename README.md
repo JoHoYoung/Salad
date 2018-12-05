@@ -86,3 +86,12 @@ if (userinfo.password == await promiseHandler.getHashedPassword(password, userin
 2. 업로드 후 리턴받은 url은 PROFILE table의 media_url 속성에 저장한다.
 3. 유저의 프로필의 user_id속성은 USER 테이블의 id를 참조하는 외래키 이다.
 4. PROFILE table에서 유저의 프로필사진, 정보 등을 관리한다.
+
+#### 게시판 CRUD
+게시판 기능을 위해 db구조를 다음과 같이 설계하였다.
+<img width="736" alt="2018-12-06 12 13 51" src="https://user-images.githubusercontent.com/37579650/49522850-eb17ab00-f8eb-11e8-8f99-d22630174a52.png">
+1. 게시판의 종류는 여러개가 있을 수 있다. 그정보는 POST_META 테이블로 관리한다.
+2. 게시글은 POST 테이블에서 관리하며 postmeta_id 속성은 POST_META 테이블의 id를 참조하는 외래키 이다.
+3. 게시글의 사진은 POSTIMAGE 테이블에서 관리하며 S3에 업로드한다.
+4. POSTIMAGE테이블의 post_id 속성은 POST 테이블의 id를 참조하는 외래키 이다.
+5. state는 정상 생성된 데이터는 'C', 삭제한 데이터는 'D'로 정의한다.

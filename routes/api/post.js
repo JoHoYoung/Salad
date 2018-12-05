@@ -197,9 +197,17 @@ router.post('/create',Multiple, helpers.asyncWrapper(async (req,res) => {
 
     await conn.query("UPDATE POST_META SET numberofpost +=1 WHERE id = '" + post_metaId + "'")
 
-    let insertQ = "INSERT INTO POST(id, postmeta_id, title, content, writer_id, created_date, updated_date) "+
-                    "VALUES(?, ?, ?, ?, ?, now(), now())"
-    await conn.query(insertQ,[uuid.v4(),post_metaId, title, content, userId])
+    let postId = uuid.v4()
+    let insertQ = "INSERT INTO POST(id, postmeta_id, title, content, writer_id, state, created_date, updated_date) "+
+                    "VALUES(?, ?, ?, ?, ?, 'C', now(), now())"
+    await conn.query(insertQ,[postId,post_metaId, title, content, userId])
+
+    for(let i=0;i<req.files.length;i++)
+    {
+        let createQ = "INSERT INTO POSTIMAGE(id, media_url, post_id, state, created_date, updated_date) "+
+                        "VALUES(?, ?, ?, 'C', now(), now())"
+        await conn.query(createQ,[uuid.v4(),req.files[i].location, postId])
+    }
 
     res.json({
         statusCode:200,
@@ -210,6 +218,144 @@ router.post('/create',Multiple, helpers.asyncWrapper(async (req,res) => {
 
 }))
 
+router.post('/read',helpers.asyncWrapper(async (req,res) => {
+
+    let conn = await pool.getConnection()
+
+    let userId
+    if (!req.user) { // No req.user
+        res.json({
+            statusCode: 719,
+            statusMsg:  "No Access Token"
+        })
+        return null
+    } else {
+        userId = req.user.userId || null
+    }
+
+    let postId = req.body.postId
+    let post = (await conn.query("SELECT * FROM POST WHERE id = '" + postId + "'"))[0][0]
+
+    let username = (await conn.query("SELECT user_name FROM USER WHERE id = '" + post.writer_id + "'"))[0][0]
+
+    let ismine
+    if(writer_id == userId)
+    {
+        ismine = true
+    }
+    else
+    {
+        ismine=false
+    }
+    let images = (await conn.query("SELECT * FROM POSTIMAGE WHERE post_id = '" + postId + "' AND state = 'C' "))[0]
+
+    res.json({
+        statusCode:200,
+        statusMsg:"success",
+        data:{
+            id: post.id,
+            title: post.title,
+            content: post.content,
+            writer_name: username,
+            star: post.star,
+            views: post.views,
+            created_date: post.created_date,
+            updated_date: post.updated_date,
+            ismine: ismine,
+            images: images
+        }
+    })
+    conn.release()
+    return
+
+}))
+
+router.post('/update',Multiple,helpers.asyncWrapper(async (req,res) => {
+
+    let conn = await pool.getConnection()
+
+    let userId
+    if (!req.user) { // No req.user
+        res.json({
+            statusCode: 719,
+            statusMsg:  "No Access Token"
+        })
+        return null
+    } else {
+        userId = req.user.userId || null
+    }
+
+    let postId = req.body.postId
+    let title = req.body.title
+    let content = req.body.content
+    let deletefile = req.body.deletefile
+
+    await conn.query("UPDATE POST SET title = ?, content = ?, updated_date = now() WHERE id = '" + postId + "'",[title,content])
+
+    for(let i=0;i<deletefile.length;i++)
+    {
+        await conn.query("UPDATE POSTIMAGE SET state = 'D' WHERE id = '" + deletefile[i] + "'")
+    }
+
+    for(let j=0;j<req.files.length;j++)
+    {
+        let createQ = "INSERT INTO POSTIMAGE(id, media_url, post_id, state, created_date, updated_date) "+
+            "VALUES(?, ?, ?, 'C', now(), now())"
+        await conn.query(createQ,[uuid.v4(),req.files[j].location, postId])
+    }
+
+    res.json({
+        statusCode:200,
+        statusMsg:"success"
+    })
+
+    conn.release()
+    return
+
+}))
+
+router.post('/delete',helpers.asyncWrapper(async (req,res) => {
+
+    let conn = await pool.getConnection()
+
+    let userId
+    if (!req.user) { // No req.user
+        res.json({
+            statusCode: 719,
+            statusMsg:  "No Access Token"
+        })
+        return null
+    } else {
+        userId = req.user.userId || null
+    }
+
+    let postId = req.body.postId
+
+    let postmeta_Id = (await conn.query("SELECT writer_id ,postmeta_id FROM POST WHERE id = '" + postId + "'"))[0][0]
+
+    if(postId != postmeta_Id.writer_id)
+    {
+        res.json({
+            statusCode: 720,
+            statusMsg: "This article is not yours"
+        })
+        conn.release()
+        return
+    }
+
+    await conn.query("UDDATE POSTIMAGE SET state ='D' WHERE post_id = '" + postId +"'")
+    await conn.query("UPDATE POST_META SET numberofpost -= 1 WHERE id = '" + postmeta_Id.postmeta_Id + "'")
+    await conn.query("UPDATE POST SET state ='D' WHERE id = '" + postId + "'")
+
+
+    res.json({
+        statusCode:200,
+        statusMsg:"success"
+    })
+    conn.release()
+    return
+
+}))
 
 
 
