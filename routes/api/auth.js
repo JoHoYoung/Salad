@@ -9,7 +9,7 @@ const promiseHandler = require('../../helper/promiseHandler')
 /**
  * @swagger
  * tags:
- *   name: Auth
+ *   name: auth
  *   description: 유저 인증 관련 API 입니다
  * definitions:
  *   Todo:
@@ -33,7 +33,7 @@ const promiseHandler = require('../../helper/promiseHandler')
  * /token:
  *   post:
  *     summary: 유저의 만료된 토큰을 갱신하여 리턴합니다.
- *     tags: [Auth]
+ *     tags: [auth]
  *     parameters:
  *      - name: accessToken
  *        in: body
@@ -132,7 +132,7 @@ router.post("/token", (req, res) => {
  * /signup:
  *   post:
  *     summary: 회원가입 을 처리합니다.
- *     tags: [Auth]
+ *     tags: [auth]
  *     parameters:
  *      - name: email
  *        in: body
@@ -256,7 +256,7 @@ router.post('/signup', helpers.asyncWrapper(async (req,res) => {
  * /signin:
  *   post:
  *     summary: 로그인및 Oauth로그인을 처리합니다.
- *     tags: [Auth]
+ *     tags: [auth]
  *     parameters:
  *      - name: email
  *        in: body
@@ -432,7 +432,7 @@ router.post('/signin', helpers.asyncWrapper(async (req,res) => {
  * /firstoauth:
  *   post:
  *     summary: Oauth 로그인을 시도한 후 300코드를 받은 유저의 회원등록을 처리합니다.
- *     tags: [Auth]
+ *     tags: [auth]
  *     parameters:
  *      - name: key
  *        in: body
@@ -539,7 +539,7 @@ router.post('/firstoauth', helpers.asyncWrapper(async (req,res) => {
  * /checkname:
  *   post:
  *     summary: 닉네임 중복체크를 합니다.
- *     tags: [Auth]
+ *     tags: [auth]
  *     parameters:
  *      - name: user_name
  *        in: body
@@ -601,7 +601,7 @@ router.post('/checkname', helpers.asyncWrapper(async (req,res) => {
  * /checkemail:
  *   post:
  *     summary: 이메일 중복체크를 합니다.
- *     tags: [Auth]
+ *     tags: [auth]
  *     parameters:
  *      - name: email
  *        in: body
