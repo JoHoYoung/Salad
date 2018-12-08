@@ -95,3 +95,37 @@ if (userinfo.password == await promiseHandler.getHashedPassword(password, userin
 3. 게시글의 사진은 POSTIMAGE 테이블에서 관리하며 S3에 업로드한다.
 4. POSTIMAGE테이블의 post_id 속성은 POST 테이블의 id를 참조하는 외래키 이다.
 5. state는 정상 생성된 데이터는 'C', 삭제한 데이터는 'D'로 정의한다.
+
+댓글기능과 게시글 추천기능을 위해 db구조를 다음과 같이 설계하였다.
+<img width="807" alt="2018-12-08 8 22 41" src="https://user-images.githubusercontent.com/37579650/49685469-281bb180-fb27-11e8-90bd-425ebc647719.png">
+
+#### 댓글 CRUD
+1. 유저는 게시판에 댓글을 남길 수 있다.
+2. COMMENT table의 post_id 속성은 POST table의 id를 참조하는 외래키 이다.
+3. 해당 키로 특정 글에 소속된 댓글정보를 가져올 수 있다.
+4. 게시글 정보를 가져오는 api호출 시 댓글정보, 댓글수, 조회수, 추천수, 특정글이 해당유저가 쓴 글인지, 해당유저가 쓴 댓글인지 정보를 제공한다.
+5. 해당정보로 삭제, 수정등의 권한을 제어할 수 있다.
+6. 댓글 삭제시 튜플을 삭제하지는 않으며 state 만 D로 변경한다.
+7. 댓글 삭제시 해당 댓글 id만 전달받으면 외래키를 통해 POST의 comment_count 속성을 제어할 수 있다.
+8. 작성 및 삭제시 POST의 comment_count 속성을 +-1 한다.
+
+댓글, 게시글의 삭제, 수정권한이 없는자가 접근시에는 해당에러코드, 메세지를 리턴한다
+```
+    if(comment.writer_id != userId)
+    {
+        res.json({
+            statusCode: 720,
+            statusMsg: "This article is not yours"
+        })
+        conn.release()
+        return
+    }
+```
+에러코드 및 메세지는 엑셀로 정리하여 클라이언트 개발자가 개발시 참고할 수 있도록 한다.
+
+#### 추천기능
+1. 추천기능은 RECOMMEND table로 관리한다.
+2. RECOMMEND table의 post_id 속성은 POST 테이블의 id를 참조하는 외래키이고 user_id 는 USER 테이블의 id를 참조하는 외래키 이다.
+3. 게시물 추천시 post_id, user_id 정보를 삽입한다.
+4. RECOMMEND table에 데이터 존재 유무로 추천취소, 중복추천등을 제어한다.
+5. 추천및 취소시 post_id 외래키를 사용하여 POST 테이블의 star 속성을 +1 or -1 한다.
