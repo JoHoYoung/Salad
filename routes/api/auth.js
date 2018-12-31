@@ -197,12 +197,13 @@ router.post("/token", (req, res) => {
  *             example: "Invalid Token"
  */
 
+
 //MARK : api/auth/signup
 router.post('/signup', helpers.asyncWrapper(async (req,res) => {
 
     let username = req.body.name
     let password = req.body.password
-    let useremail = req.body.email
+    let useremail = req.body.uid
 
     let conn = await pool.getConnection()
 
@@ -651,6 +652,80 @@ router.post('/checkemail', helpers.asyncWrapper(async (req,res) => {
         })
         conn.release()
         return
+    }
+
+}))
+
+
+/**
+ * @swagger
+ * /assign:
+ *   post:
+ *     summary: uid로 접근합니다.
+ *     tags: [auth]
+ *     parameters:
+ *      - name: uid
+ *        in: body
+ *        description: 기기 uid로 접근합니다.
+ *        type: array
+ *        example: "58121ew-1313xqo"
+ *     responses:
+ *       200:
+ *         description: 토근을 반납합니다.
+ *         properties:
+ *           statusCode:
+ *             type : integer
+ *             example : 200
+ *           statusMsg:
+ *              type : string
+ *              example : "success"
+ *           data:
+ *              type: object
+ *              properties:
+ *                  accessToken :
+ *                      type : string
+ *                      example : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ0ZXN0aWQiLCJleHAiOjE1NDM4MjYwNzIsImlhdCI6MTU0MzczOTY3Mn0.82zH2AdRxUfnFjWC1WZtqpO-Gx3iov-CCRUsTEMcu-Q"
+ *                  refreshToken :
+ *                      type : string
+ *                      example : "wqerqr3143424312234123412344321321324CJ9.eyJ1213412344132QiLCJleHAiOjE1NDM4MjYwNzIsImlhdCI6MTU0MzczOTY3Mn0.82zH2AdRxUfnFjWC1WZtqpO-Gx3iov-CCRUsTEMcu-Q"
+ */
+//MARK : api/auth/assign
+router.post('/assign', helpers.asyncWrapper(async (req,res) => {
+
+    let uid = req.body.uid
+
+    let conn = await pool.getConnection()
+
+    let emailExistQ = "SELECT * FROM USER WHERE id = ?"
+    let emailExist = (await conn.query(emailExistQ,[uid]))[0][0]
+
+    if(emailExist != null)
+    {
+        let insertQ = "INSERT INTO USER(id, state, created_date, updated_date) VALUES(?, ?, now(), now())"
+        await conn.query(insertQ,[uid,'C'])
+        jwt.generate(uid, function (err, accesstoken, refreshtoken) {
+            res.json({
+                statusCode: 200,
+                statusMsg: "success",
+                accesstoken: accesstoken,
+                refreshtoken: refreshtoken
+            })
+            conn.release()
+            return
+        })
+    }
+    else
+    {
+        jwt.generate(uid, function (err, accesstoken, refreshtoken) {
+            res.json({
+                statusCode: 200,
+                statusMsg: "success",
+                accesstoken: accesstoken,
+                refreshtoken: refreshtoken
+            })
+            conn.release()
+            return
+        })
     }
 
 }))
