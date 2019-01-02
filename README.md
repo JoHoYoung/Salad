@@ -129,3 +129,40 @@ if (userinfo.password == await promiseHandler.getHashedPassword(password, userin
 3. 게시물 추천시 post_id, user_id 정보를 삽입한다.
 4. RECOMMEND table에 데이터 존재 유무로 추천취소, 중복추천등을 제어한다.
 5. 추천및 취소시 post_id 외래키를 사용하여 POST 테이블의 star 속성을 +1 or -1 한다.
+
+DB pool Connection 에러 수정
+1. 기존로직에서 간헐적으로 max pool connection 에러가 발생.
+2. 제한보다 pool을 많이 만들어서 발생하는 에러.
+3. 코드 점검결과 매번 db에 접속시 pool을 생성하기 때문임.
+4. DB에 접근시 pool을 생성하는 것이 아닌 connection만 가져와서 사용하도록 변경
+```
+const mysql2 = require("mysql2/promise")
+const account = require("../config/account")
+
+function createPool() {
+    try {
+        // Initialize MySQL DB
+        const pool = mysql2.createPool({
+            host: account.MYSQL_HOST,
+            user: account.MYSQL_USERID,
+            password: account.MYSQL_PASSWORD,
+            database: account.MYSQL_DATABASE,
+            port: account.MYSQL_PORT,
+            connectionLimit: account.MYSQL_CONNECTION_LIMIT,
+            dateStrings: ['DATE', 'DATETIMES'],
+            waitForConnections: true,
+            queueLimit: 0
+        })
+
+        return pool;
+    } catch (error) {
+        return console.log(`Could not connect - ${error}`);
+    }
+}
+
+const pool = createPool()
+
+module.exports = {
+    connection: async() => pool.getConnection()
+}
+```

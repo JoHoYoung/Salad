@@ -147,7 +147,7 @@ const S3 = require('../../helper/awsS3')
 
 router.post('/list', helpers.asyncWrapper(async (req,res) => {
 
-    let conn = await pool.getConnection()
+    let conn = await db.connection()
     let post_metaId = req.body.post_metaId
     let offset = parseInt(req.body.page)*10
 
@@ -249,7 +249,7 @@ router.post('/list', helpers.asyncWrapper(async (req,res) => {
 let Multiple = S3.uploadArray
 router.post('/create',Multiple, helpers.asyncWrapper(async (req,res) => {
 
-    let conn = await pool.getConnection()
+    let conn = await db.connection()
 
     let userId
     if (!req.user) { // No req.user
@@ -455,7 +455,7 @@ router.post('/create',Multiple, helpers.asyncWrapper(async (req,res) => {
  */
 router.post('/read',helpers.asyncWrapper(async (req,res) => {
 
-    let conn = await pool.getConnection()
+    let conn = await db.connection()
 
     let userId
     if (!req.user) { // No req.user
@@ -583,7 +583,7 @@ router.post('/read',helpers.asyncWrapper(async (req,res) => {
 
 router.post('/update',Multiple,helpers.asyncWrapper(async (req,res) => {
 
-    let conn = await pool.getConnection()
+    let conn = await db.connection()
 
     let userId
     if (!req.user) { // No req.user
@@ -690,7 +690,7 @@ router.post('/update',Multiple,helpers.asyncWrapper(async (req,res) => {
 
 router.post('/delete',helpers.asyncWrapper(async (req,res) => {
 
-    let conn = await pool.getConnection()
+    let conn = await db.connection()
 
     let userId
     if (!req.user) { // No req.user
@@ -778,7 +778,7 @@ router.post('/delete',helpers.asyncWrapper(async (req,res) => {
  */
 router.post('/comment',helpers.asyncWrapper(async (req,res) => {
 
-    let conn = await pool.getConnection()
+    let conn = await db.connection()
 
     let userId
     if (!req.user) { // No req.user
@@ -862,7 +862,7 @@ router.post('/comment',helpers.asyncWrapper(async (req,res) => {
 
 router.post('/decomment',helpers.asyncWrapper(async (req,res) => {
 
-    let conn = await pool.getConnection()
+    let conn = await db.connection()
 
     let userId
     if (!req.user) { // No req.user
@@ -959,7 +959,7 @@ router.post('/decomment',helpers.asyncWrapper(async (req,res) => {
 
 router.post('/recomment',helpers.asyncWrapper(async (req,res) => {
 
-    let conn = await pool.getConnection()
+    let conn = await db.connection()
 
     let userId
     if (!req.user) { // No req.user
@@ -1050,7 +1050,7 @@ router.post('/recomment',helpers.asyncWrapper(async (req,res) => {
  */
 router.post('/star',helpers.asyncWrapper(async (req,res) => {
 
-    let conn = await pool.getConnection()
+    let conn = await db.connection()
 
     let userId
     if (!req.user) { // No req.user
@@ -1145,7 +1145,7 @@ router.post('/star',helpers.asyncWrapper(async (req,res) => {
  */
 router.post('/destar',helpers.asyncWrapper(async (req,res) => {
 
-    let conn = await pool.getConnection()
+    let conn = await db.connection()
 
     let userId
     if (!req.user) { // No req.user

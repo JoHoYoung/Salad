@@ -2,7 +2,6 @@ const router = require('express').Router();
 const helpers = require('../../helper/helper')
 const uuid = require('uuid')
 const db = require('../../helper/mysql')
-const pool = db.pool
 const promiseHandler = require('../../helper/promiseHandler')
 const S3 = require('../../helper/awsS3')
 
@@ -73,7 +72,7 @@ router.post('/profileupload',Single,helpers.asyncWrapper(async (req, res)=>{
         userId = req.user.userId || null
     }
 
-    let conn = await pool.getConnection()
+    let conn = await db.connection()
 
     let profileQ = "SELECT * FROM PROFILE WHERE user_id = ?"
     let profile = (await conn.query(profileQ,[userId]))[0][0]

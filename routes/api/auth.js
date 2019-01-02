@@ -2,9 +2,7 @@ const router = require('express').Router();
 const helpers = require('../../helper/helper')
 const uuid = require('uuid')
 const jwt = require('../../helper/jwtauth')
-const crypto = require('crypto')
 const db = require('../../helper/mysql')
-const pool = db.pool
 const promiseHandler = require('../../helper/promiseHandler')
 /**
  * @swagger
@@ -205,7 +203,7 @@ router.post('/signup', helpers.asyncWrapper(async (req,res) => {
     let password = req.body.password
     let useremail = req.body.uid
 
-    let conn = await pool.getConnection()
+    let conn = await db.connection()
 
     let emailExistQ = "SELECT * FROM USER WHERE user_email = ?"
     let nameExistQ = "SELECT * FROM USER WHERE user_name = ?"
@@ -350,7 +348,7 @@ router.post('/signup', helpers.asyncWrapper(async (req,res) => {
 //MARK : api/auth/signin
 router.post('/signin', helpers.asyncWrapper(async (req,res) => {
 
-    let conn = await pool.getConnection()
+    let conn = await db.connection()
 
     if(req.body.provider_type == 0) {
         let useremail = req.body.email
@@ -499,7 +497,7 @@ router.post('/signin', helpers.asyncWrapper(async (req,res) => {
 //MARK: api/auth/firstoauth
 router.post('/firstoauth', helpers.asyncWrapper(async (req,res) => {
 
-    let conn = await pool.getConnection()
+    let conn = await db.connection()
     let key = req.body.key
     let provider_type = req.body.provider_type
     let user_name = req.body.user_name
@@ -694,7 +692,7 @@ router.post('/assign', helpers.asyncWrapper(async (req,res) => {
 
     let uid = req.body.uid
 
-    let conn = await pool.getConnection()
+    let conn = await db.connection()
 
     let emailExistQ = "SELECT * FROM USER WHERE id = ?"
     let emailExist = (await conn.query(emailExistQ,[uid]))[0][0]
